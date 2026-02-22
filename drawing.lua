@@ -9,6 +9,7 @@ require('cairo_imlib2_helper')
 
 PADDING_PX = 8
 TITLE_SIZE = 32
+ICON_SIZE = 24
 LINE_HEIGHT = 22
 DIM_COLOR = 0.6
 
@@ -93,7 +94,7 @@ end
 
 -- Primitive drawing ---------------------------------------------------------------------
 
-function draw_panel(cr, rect, title)
+function draw_panel(cr, rect, title, icon)
     if title == nil then
         title = "N/A"
     end
@@ -117,6 +118,16 @@ function draw_panel(cr, rect, title)
 
     cairo_move_to(cr, rect.x + x, rect.y + 30)
     cairo_show_text(cr, title)
+
+    -- Render icon
+    if icon ~= nil then
+        cairo_select_font_face(cr, "MesloLGL Nerd Font");
+        cairo_set_font_size(cr, ICON_SIZE)
+
+        local x_icon = rect.x + x - ICON_SIZE - 8
+        cairo_move_to(cr, x_icon, rect.y + PADDING_PX + 20)
+        cairo_show_text(cr, icon)
+    end
 end
 
 function draw_text_indicator(cr, title, formula, unit, pos)
@@ -183,7 +194,7 @@ PANEL_SYSINFO_H = 120
 function draw_sysinfo(cr, layout)
     local panel = layout.sysinfo
     local panel_y_bottom = layout.sysinfo.y + layout.sysinfo.h
-    draw_panel(cr, panel, "System information")
+    draw_panel(cr, panel, "System information", "\u{ea74}")
 
     draw_text_indicator_array(cr, layout.cpu, panel_y_bottom, {
         { title = "Uptime",    formula = "${uptime}" },
@@ -199,7 +210,7 @@ end
 
 function draw_cpu(cr, layout)
     local panel = layout.cpu
-    draw_panel(cr, panel, "CPU")
+    draw_panel(cr, panel, "CPU", "\u{f4bc}")
     draw_text_indicator_array(cr, panel, nil, {
         { title = "Utilization", formula = "${cpu}",      unit = "%" },
         { title = "Temperature", formula = "${acpitemp}", unit = "°C" },
@@ -209,7 +220,7 @@ end
 
 function draw_mem(cr, layout)
     local panel = layout.mem
-    draw_panel(cr, panel, "Memory")
+    draw_panel(cr, panel, "Memory", "\u{efc5}]")
     draw_text_indicator_array(cr, panel, nil, {
         { title = "Main", formula = "$mem / $memmax" },
         { title = "SWAP", formula = "$swap / $swapmax" },
@@ -219,7 +230,7 @@ end
 
 function draw_gpu(cr, layout)
     local panel = layout.gpu
-    draw_panel(cr, panel, "GPU")
+    draw_panel(cr, panel, "GPU", "\u{f061a}")
     draw_text_indicator_array(cr, panel, nil, {
         { title = "Utilization", formula = exec_nvidia_smi("utilization.gpu"),         unit = "%" },
         { title = "Temperature", formula = exec_nvidia_smi("temperature.gpu"),         unit = "°C" },
@@ -229,7 +240,7 @@ end
 
 function draw_disks(cr, layout)
     local panel = layout.disks
-    draw_panel(cr, panel, "I/O")
+    draw_panel(cr, panel, "I/O", "\u{f0c7}")
     draw_text_indicator_array(cr, panel, nil, {
         { title = "Read / write", formula = "$diskio_read / $diskio_write" },
         { title = "/",            formula = "${fs_used /} / ${fs_size /}" },

@@ -3,6 +3,7 @@
 
 require("cairo")
 require("cairo_xlib")
+require('cairo_imlib2_helper')
 
 -- Conly Hooks ---------------------------------------------------------------------------
 
@@ -75,6 +76,9 @@ function conky_before_draw()
         h = (conky_window.height - layout.sysinfo.h) / 2 - (2 * PADDING_PX),
     }
 
+    -- Draw background
+    cairo_place_image("/home/alemoigne/.config/conky/background.jpg", cr, 0, 0, 1280, 851, 1)
+
     -- Draw main component
     draw_cpu(cr, layout)
     draw_mem(cr, layout)
@@ -89,17 +93,19 @@ end
 
 -- Primitive drawing ---------------------------------------------------------------------
 
-function set_source_rgb(cr, r, g, b)
-    cairo_set_source_rgba(cr, r / 255, g / 255, b / 255, 1)
-end
-
 function draw_panel(cr, rect, title)
     if title == nil then
         title = "N/A"
     end
 
+    -- Render border
+    cairo_rectangle(cr, rect.x, rect.y, rect.w, rect.h)
+    cairo_set_source_rgba(cr, 0, 0, 0, 0.7)
+    cairo_fill_preserve(cr)
+    cairo_set_source_rgba(cr, 0, 0.73, 1, 1)
+    cairo_stroke(cr)
+
     -- Configure font for title
-    set_source_rgb(cr, 0, 187, 255)
     cairo_select_font_face(cr, "Jurist Dire Title");
     cairo_set_font_size(cr, TITLE_SIZE)
 
@@ -111,10 +117,6 @@ function draw_panel(cr, rect, title)
 
     cairo_move_to(cr, rect.x + x, rect.y + 30)
     cairo_show_text(cr, title)
-
-    -- Render border
-    cairo_rectangle(cr, rect.x, rect.y, rect.w, rect.h)
-    cairo_stroke(cr)
 end
 
 function draw_text_indicator(cr, title, formula, unit, pos)

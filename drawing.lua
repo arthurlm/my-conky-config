@@ -190,7 +190,6 @@ function draw_sysinfo(cr, layout)
         { title = "Processes", formula = "${processes}" },
         { title = "Uploading", formula = "${upspeed}" },
     })
-
     draw_text_indicator_array(cr, layout.mem, panel_y_bottom, {
         { title = "Hostname",    formula = "${nodename}" },
         { title = "Kernel",      formula = "${kernel}" },
@@ -235,6 +234,7 @@ function draw_disks(cr, layout)
         { title = "Read / write", formula = "$diskio_read / $diskio_write" },
         { title = "/",            formula = "${fs_used /} / ${fs_size /}" },
         { title = "/data",        formula = "${fs_used /data} / ${fs_size /data}" },
+        { title = "/boot",        formula = "${fs_used /boot} / ${fs_size /boot}" },
     })
 end
 

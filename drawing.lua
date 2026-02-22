@@ -160,7 +160,13 @@ function draw_text_indicator(cr, title, formula, unit, pos)
     cairo_show_text(cr, value)
 end
 
-function draw_text_indicator_array(cr, panel, y_start, indicators)
+function draw_text_indicator_array(cr, panel, panel_y_bottom, indicators)
+    if panel_y_bottom == nil then
+        panel_y_bottom = panel.y + panel.h
+    end
+
+    local y_start = panel_y_bottom - ((#indicators - 1) * LINE_HEIGHT) - PADDING_PX
+
     for i, indicator in ipairs(indicators) do
         draw_text_indicator(cr, indicator.title, indicator.formula, indicator.unit, {
             x = panel.x + PADDING_PX,
@@ -176,15 +182,16 @@ PANEL_SYSINFO_H = 120
 
 function draw_sysinfo(cr, layout)
     local panel = layout.sysinfo
+    local panel_y_bottom = layout.sysinfo.y + layout.sysinfo.h
     draw_panel(cr, panel, "System information")
 
-    draw_text_indicator_array(cr, layout.cpu, panel.y + 52, {
+    draw_text_indicator_array(cr, layout.cpu, panel_y_bottom, {
         { title = "Uptime",    formula = "${uptime}" },
         { title = "Processes", formula = "${processes}" },
         { title = "Uploading", formula = "${upspeed}" },
     })
 
-    draw_text_indicator_array(cr, layout.mem, panel.y + 52, {
+    draw_text_indicator_array(cr, layout.mem, panel_y_bottom, {
         { title = "Hostname",    formula = "${nodename}" },
         { title = "Kernel",      formula = "${kernel}" },
         { title = "Downloading", formula = "${downspeed}" },
@@ -194,7 +201,7 @@ end
 function draw_cpu(cr, layout)
     local panel = layout.cpu
     draw_panel(cr, panel, "CPU")
-    draw_text_indicator_array(cr, panel, panel.y + 170, {
+    draw_text_indicator_array(cr, panel, nil, {
         { title = "Utilization", formula = "${cpu}",      unit = "%" },
         { title = "Temperature", formula = "${acpitemp}", unit = "°C" },
         { title = "Frequency",   formula = "${freq_g}",   unit = "GHz" },
@@ -204,7 +211,7 @@ end
 function draw_mem(cr, layout)
     local panel = layout.mem
     draw_panel(cr, panel, "Memory")
-    draw_text_indicator_array(cr, panel, panel.y + 170, {
+    draw_text_indicator_array(cr, panel, nil, {
         { title = "Main", formula = "$mem / $memmax" },
         { title = "SWAP", formula = "$swap / $swapmax" },
         { title = "VRAM", formula = exec_nvidia_smi("memory.used") .. " / " .. exec_nvidia_smi("memory.total"), unit = "MB" },
@@ -214,7 +221,7 @@ end
 function draw_gpu(cr, layout)
     local panel = layout.gpu
     draw_panel(cr, panel, "GPU")
-    draw_text_indicator_array(cr, panel, panel.y + 170, {
+    draw_text_indicator_array(cr, panel, nil, {
         { title = "Utilization", formula = exec_nvidia_smi("utilization.gpu"),         unit = "%" },
         { title = "Temperature", formula = exec_nvidia_smi("temperature.gpu"),         unit = "°C" },
         { title = "Frequency",   formula = exec_nvidia_smi("clocks.current.graphics"), unit = "MHz" },
@@ -224,7 +231,7 @@ end
 function draw_disks(cr, layout)
     local panel = layout.disks
     draw_panel(cr, panel, "I/O")
-    draw_text_indicator_array(cr, panel, panel.y + 170, {
+    draw_text_indicator_array(cr, panel, nil, {
         { title = "Read / write", formula = "$diskio_read / $diskio_write" },
         { title = "/",            formula = "${fs_used /} / ${fs_size /}" },
         { title = "/data",        formula = "${fs_used /data} / ${fs_size /data}" },

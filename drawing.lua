@@ -134,13 +134,16 @@ function draw_text_indicator(cr, title, formula, unit, pos)
     cairo_set_font_size(cr, 20)
 
     -- Draw title
-    cairo_move_to(cr, pos.x, pos.y)
+    local x_left = pos.x
+    local x_right = pos.x + pos.w
+
+    cairo_move_to(cr, x_left, pos.y)
     cairo_set_source_rgba(cr, DIM_COLOR, DIM_COLOR, DIM_COLOR, 1)
     cairo_show_text(cr, title)
 
     -- Draw unit
     cairo_text_extents(cr, unit, extents)
-    local text_x = pos.x + pos.w - extents.x_advance - (PADDING_PX * 2)
+    local text_x = x_right - extents.x_advance
 
     cairo_move_to(cr, text_x, pos.y)
     cairo_set_source_rgba(cr, DIM_COLOR, DIM_COLOR, DIM_COLOR, 1)
@@ -156,10 +159,10 @@ function draw_text_indicator(cr, title, formula, unit, pos)
 end
 
 function draw_text_indicator_array(cr, panel, y_start, indicators)
-    for i, indicator in pairs(indicators) do
+    for i, indicator in ipairs(indicators) do
         draw_text_indicator(cr, indicator.title, indicator.formula, indicator.unit, {
             x = panel.x + PADDING_PX,
-            w = panel.w,
+            w = panel.w - 2 * PADDING_PX,
             y = y_start + (LINE_HEIGHT * (i - 1)),
         })
     end
@@ -202,7 +205,7 @@ function draw_mem(cr, layout)
     draw_text_indicator_array(cr, panel, panel.y + 170, {
         { title = "Main", formula = "$mem / $memmax" },
         { title = "SWAP", formula = "$swap / $swapmax" },
-        { title = "VRAM", formula = exec_nvidia_smi("memory.used") .. " / " .. exec_nvidia_smi("memory.total"),  unit = "MB" },
+        { title = "VRAM", formula = exec_nvidia_smi("memory.used") .. " / " .. exec_nvidia_smi("memory.total"), unit = "MB" },
     })
 end
 
